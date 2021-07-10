@@ -10,9 +10,7 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 #initiate memory cache of database
-conn = sqlite3.connect('11percent.db')
-users = pd.read_csv('DataTest/app/clean_11perc.csv')
-users.to_sql('delaydata', conn, if_exists='append', index = False)
+conn = sqlite3.connect('flightdelay.db')
 query = "SELECT * FROM delaydata"
 df = pd.read_sql(query, conn)
 conn.close()
