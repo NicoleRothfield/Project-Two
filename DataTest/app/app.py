@@ -10,8 +10,10 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 #initiate memory cache of database
-conn = sqlite3.connect('my_data.db')
-query = "SELECT * FROM flightdata"
+conn = sqlite3.connect('11percent.db')
+users = pd.read_csv('DataTest/app/clean_11perc.csv')
+users.to_sql('delaydata', conn, if_exists='append', index = False)
+query = "SELECT * FROM delaydata"
 df = pd.read_sql(query, conn)
 conn.close()
 
@@ -28,6 +30,13 @@ def getData():
     airline_agg.columns = ["Airline", "Count"]
 
     return(jsonify(json.loads(airline_agg.to_json(orient="records"))))
+
+@app.route("/sunburst", methods=["GET"])
+def sunburst():
+    #create aggregate 1
+    #data = pd.read_sql("SELECT * FROM delaydata", conn)
+    sunburstdata = df[["ORIGIN_STATE_NM", "ORIGIN", "MKT_UNIQUE_CARRIER", "CARRIER_DELAY", "WEATHER_DELAY", "NAS_DELAY", "SECURITY_DELAY", "LATE_AIRCRAFT_DELAY"]]
+    return(jsonify(json.loads(sunburstdata.to_json(orient="records"))))    
 
 ####################################
 # ADD MORE ENDPOINTS
