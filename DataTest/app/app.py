@@ -4,14 +4,16 @@ import pandas as pd
 import numpy as np
 import os
 import sqlite3
+
+from pandas.io import sql
 #comment
 #init app and class
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 #initiate memory cache of database
-conn = sqlite3.connect('flightdelay.db')
-query = "SELECT * FROM delaydata"
+conn = sqlite3.connect('DataTest/app/flightdelay.db')
+query = "SELECT * FROM delaydata dd left join carrierdata cd on dd.MKT_UNIQUE_CARRIER = cd.Code"
 df = pd.read_sql(query, conn)
 conn.close()
 
@@ -40,6 +42,47 @@ def sunburst():
 # ADD MORE ENDPOINTS
 ###########################################
 #approute for bar chart
+
+@app.route("/averageDepartureDelay", methods=["GET"])
+def averageDepartureDelay():
+    deptgroup = df.groupby(["ORIGIN", "Description"])
+    Mean = deptgroup["DEP_DELAY"].mean()
+    DeptDelaySummary = pd.DataFrame({"AvgDeptDelay": Mean})
+    AvgDeptDelaySummary = DeptDelaySummary.reset_index()
+    return(jsonify(json.loads(AvgDeptDelaySummary.to_json(orient="records"))))
+
+@app.route("/getAirports", methods=["GET"])
+def getAirports():
+    #create aggregate 1
+    airport_agg = df.groupby(["ORIGIN"]).size().reset_index()
+    airport_agg.columns = ["Airport", "Count"]
+    return(jsonify(json.loads(airport_agg.to_json(orient="records"))))
+
+@app.route("/delaySummary", methods=["GET"])
+def getDelaySummary():
+    deptgroup = df.groupby(["ORIGIN"])
+    CarrierDelaySum = deptgroup["CARRIER_DELAY"].sum()
+    WeatherDelaySum = deptgroup["WEATHER_DELAY"].sum()
+    NASDelaySum = deptgroup["NAS_DELAY"].sum()
+    SecurityDelaySum = deptgroup["SECURITY_DELAY"].sum()
+    LateAircraftDelaySum = deptgroup["LATE_AIRCRAFT_DELAY"].sum()
+    DeptDelayReasonSummary = pd.DataFrame({
+        "SumCarrierDelay": CarrierDelaySum,
+        "SumWeatherDelay": WeatherDelaySum,
+        "SumNASDelay": NASDelaySum,
+        "SumSecurityDelay": SecurityDelaySum,
+        "SumLateAircraftDelay": LateAircraftDelaySum
+    })
+    getDeptDelayReasonSummary = DeptDelayReasonSummary.reset_index()
+    return(jsonify(json.loads(getDeptDelayReasonSummary.to_json(orient="records"))))
+
+@app.route("/getCarrierData", methods=["GET"])
+def getCarriers():
+    conn = sqlite3.connect('DataTest/app/flightdelay.db')
+    query = "SELECT * FROM carrierdata"
+    carrierdf = pd.read_sql(query, conn)
+    conn.close()
+    return(jsonify(json.loads(carrierdf.to_json(orient="records"))))
 
 #app route for scatterplot
 
