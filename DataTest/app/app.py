@@ -36,7 +36,21 @@ def sunburst():
     #create aggregate 1
     #data = pd.read_sql("SELECT * FROM delaydata", conn)
     sunburstdata = df[["ORIGIN_STATE_NM", "ORIGIN", "MKT_UNIQUE_CARRIER", "CARRIER_DELAY", "WEATHER_DELAY", "NAS_DELAY", "SECURITY_DELAY", "LATE_AIRCRAFT_DELAY"]]
-    return(jsonify(json.loads(sunburstdata.to_json(orient="records"))))    
+    return(jsonify(json.loads(sunburstdata.to_json(orient="records")))) 
+
+@app.route("/delaydata1", methods=["GET"])
+def delaydata():
+    return(jsonify(json.loads(df.to_json(orient="records"))))
+
+@app.route("/averageDayOfWeekDepartureDelay", methods=["GET"])
+def DoWaverageDepartureDelay():
+    DoWgroup = df.groupby(["DAY_OF_WEEK", "MKT_UNIQUE_CARRIER"])
+    DptMean = DoWgroup["DEP_DELAY"].mean()
+    ArrMean = DoWgroup["ARR_DELAY"].mean()
+    DoWDeptDelaySummary = pd.DataFrame({"AvgDeptDelay": DptMean, "AvgArrDelay":ArrMean})
+    DoWAvgDeptDelaySummary = DoWDeptDelaySummary.reset_index()
+    return(jsonify(json.loads(DoWAvgDeptDelaySummary.to_json(orient="records"))))
+
 
 ####################################
 # ADD MORE ENDPOINTS
