@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 #initiate memory cache of database
-conn = sqlite3.connect('DataTest/app/flightdelay.db')
+conn = sqlite3.connect('app/flightdelay.db')
 query = "SELECT * FROM delaydata dd left join carrierdata cd on dd.MKT_UNIQUE_CARRIER = cd.Code"
 df = pd.read_sql(query, conn)
 conn.close()
