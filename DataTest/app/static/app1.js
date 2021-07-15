@@ -14,7 +14,7 @@ var height = svgHeight - margin.top - margin.bottom;
 // Create an SVG wrapper, append an SVG group that will hold our chart,
 // and shift the latter by left and top margins.
 var svg = d3
-  .select(".chart")
+  .select("#chart")
   .append("svg")
   .attr("width", svgWidth)
   .attr("height", svgHeight);
@@ -24,7 +24,7 @@ var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Initial Params
-var chosenXAxis = "DEP_DELAY";
+var chosenXAxis = "AvgDeptDelay";
 
 // function used for updating x-scale var upon click on axis label
 function xScale(airlineData, chosenXAxis) {
@@ -66,7 +66,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
 
   var label;
 
-  if (chosenXAxis === "DEP_DELAY") {
+  if (chosenXAxis === "AvgDeptDelay") {
     label = "Departure Delay:";
   }
   else {
@@ -75,9 +75,9 @@ function updateToolTip(chosenXAxis, circlesGroup) {
 
   var toolTip = d3.tip()
     .attr("class", "tooltip")
-    .offset([80, -60])
+    .offset([80, -80])
     .html(function(d) {
-      return (`${d.MKT_UNIQUE_CARRIER}<br>${label} ${d[chosenXAxis]}`);
+      return (`${d.MKT_UNIQUE_CARRIER}<br>${label} ${d[chosenXAxis]} `);
     });
 
   circlesGroup.call(toolTip);
@@ -94,14 +94,14 @@ function updateToolTip(chosenXAxis, circlesGroup) {
 }
 
 // Retrieve data from the CSV file and execute everything below
-d3.csv("clean_11perc.csv").then(function(airlineData, err) {
+d3.json("/averageDayOfWeekDepartureDelay").then(function(airlineData, err) {
   if (err) throw err;
 
   // parse data
   airlineData.forEach(function(data) {
-    data.DEP_DELAY = +data.DEP_DELAY;
+    data.AvgDeptDelay = +data.AvgDeptDelay;
     data.DAY_OF_WEEK = +data.DAY_OF_WEEK;
-    data.ARR_DELAY = +data.ARR_DELAY;
+    data.AvgArrDelay = +data.AvgArrDelay;
   });
 
   // xLinearScale function above csv import
@@ -114,7 +114,7 @@ d3.csv("clean_11perc.csv").then(function(airlineData, err) {
 
   // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
-  var leftAxis = d3.axisLeft(yLinearScale);
+  var leftAxis = d3.axisLeft(yLinearScale).ticks(7);
 
   // append x axis
   var xAxis = chartGroup.append("g")
@@ -134,7 +134,7 @@ d3.csv("clean_11perc.csv").then(function(airlineData, err) {
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d.DAY_OF_WEEK))
     .attr("r", 8)
-    .attr("fill", "blue")
+    .attr("fill", "rgb(60, 126, 202)")
     .attr("opacity", ".8");
 
   // Create group for two x-axis labels
@@ -144,14 +144,14 @@ d3.csv("clean_11perc.csv").then(function(airlineData, err) {
   var airlineLengthLabel = labelsGroup.append("text")
     .attr("x", 0)
     .attr("y", 20)
-    .attr("value", "DEP_DELAY") // value to grab for event listener
+    .attr("value", "AvgDeptDelay") // value to grab for event listener
     .classed("active", true)
     .text("Depature Delay");
 
   var albumsLabel = labelsGroup.append("text")
     .attr("x", 0)
     .attr("y", 40)
-    .attr("value", "ARR_DELAY") // value to grab for event listener
+    .attr("value", "AvgArrDelay") // value to grab for event listener
     .classed("inactive", true)
     .text("Arrival Delay");
 
@@ -193,7 +193,7 @@ d3.csv("clean_11perc.csv").then(function(airlineData, err) {
         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
         // changes classes to change bold text
-        if (chosenXAxis === "ARR_DELAY") {
+        if (chosenXAxis === "AvgArrDelay") {
           albumsLabel
             .classed("active", true)
             .classed("inactive", false);

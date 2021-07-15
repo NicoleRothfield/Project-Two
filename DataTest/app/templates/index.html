@@ -6,11 +6,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Flight Delay Dashboard</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="DataTest/app/static/css/style.css" rel="stylesheet" type="text/css" media="screen, projection"/>
+  <style>
+    .chart::before {
+      position: absolute;
+      top: 50px;
+      left: 300px;
+      z-index: -1;
+      display: block;
+      width: 400px;
+      height: 300px;
+      content: " ";
+      background-repeat: no-repeat;
+      background-position: 50% 0;
+      background-size: cover;
+      opacity: 0.3;
+    }
+      .active {
+    font-weight: bolder;
+    fill: #000;
+    fill: #af1a1a;
+    transition: fill 0.5s ease-out;
+    text-anchor: middle;
+  }
+  ​
+    .inactive {
+      font-weight: lighter;
+      fill: #000000;
+      transition: fill 0.3s ease-out;
+      text-anchor: middle;
+    }
+
+    .tooltip {
+    position: absolute;
+    width: 135px;
+    height: 80px;
+    padding: 5px;
+    padding-top: 8px;
+    font: 12px;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    background: rgb(60, 126, 202);
+    border: 0;
+    border-radius: 10px;
+  }
+  ​
+  .axis-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    fill: #0a0a0a;
+    text-anchor: middle;
+  }
+  </style>
 </head>
 
 <body>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   <div class="container">
@@ -21,7 +74,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-2">
+      <div class="col-md-12">
         <div class="well">
           <h5>Choose Your Departure Airport:</h5>
           <select id="selDataset" onchange="optionChanged(this.value)"></select>
@@ -31,11 +84,14 @@
           </div>
         </div>
       </div>
-      <div class="col-md-12">
+      <div class="col-md-10">
         <div id="bar"></div>
       </div>
       <div class="col-md-12">
         <div id="bar2"></div>
+      </div>
+      <div class="col-md-12">
+        <div id="chart"></div>
       </div>
       <dl class="row">
         <dt class="col-sm-3">Delay Dictionary</dt>
@@ -66,6 +122,6 @@
     </div>
   </div>
   <script src="static/app.js"></script>
-  <script src="DataTest\app\static\scatter.js"></script>
+  <script src="static/app1.js"></script>
 </body>
 </html>
